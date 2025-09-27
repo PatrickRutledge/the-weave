@@ -1,0 +1,7 @@
+{
+  "name": "the-weave",
+  "version": "0.1.0",
+  "bin": {
+    "the-weave": "dist/cli.js"
+  }
+}

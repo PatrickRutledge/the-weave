@@ -1,0 +1,11 @@
+[
+  {
+    "title": "Address flaky unit tests in payments module",
+    "description": "5+ build failures over 14 days on CI for payments/*",
+    "patterns": ["buildFailures", "timeSinks"],
+    "references": ["pr:#123", "commit:abc123"],
+    "labels": ["weaver", "stability"],
+    "recommended_actions": ["Quarantine flaky tests", "Add retry logic", "Improve mocks"],
+    "evidence": "CI logs on runs 251-263 show retries and failures"
+  }
+]

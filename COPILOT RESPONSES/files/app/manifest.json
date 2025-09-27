@@ -1,0 +1,15 @@
+{
+  "name": "Weaver Review App",
+  "url": "https://example.com/weaver",
+  "hook_attributes": { "url": "https://your-deployment.example.com/api/github/webhooks" },
+  "redirect_url": "https://your-deployment.example.com/install",
+  "public": false,
+  "default_events": ["issue_comment", "pull_request"],
+  "default_permissions": {
+    "pull_requests": "read",
+    "contents": "read",
+    "issues": "write",
+    "metadata": "read",
+    "actions": "write"
+  }
+}
