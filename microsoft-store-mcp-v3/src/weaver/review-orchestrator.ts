@@ -188,7 +188,7 @@ export class ReviewOrchestrator {
   
   private findCommitClusters(commits: any[]): any[] {
     // Find areas where many commits happened in short time
-    const clusters = [];
+    const clusters: any[] = [];
     // Implementation would analyze timestamp patterns
     return clusters;
   }
