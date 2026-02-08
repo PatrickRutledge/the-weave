@@ -1,272 +1,127 @@
-# Microsoft Store MCP Server with Weaver Integration
+# The Weaver
 
-An MCP (Model Context Protocol) server for Microsoft Store submissions that includes the Weaver retrospective learning system. This server enforces step-by-step agent interactions inspired by BMAD patterns to prevent "information dumping" and ensure thoughtful dialogue.
+An open-source MCP server that facilitates structured lessons-learned retrospectives on software projects by analyzing git repositories.
 
-## Key Features
+The Weaver helps developers improve their skills, understand project decisions, and build institutional knowledge by reflecting on their own development history — through genuine dialogue, not checklists.
 
-### 🎯 Core Capabilities
-- **Step-by-step enforcement**: Agents ask ONE question at a time, wait for answers
-- **Weaver Review**: Retrospective analysis of project patterns and lessons
-- **Weaver Investigation**: Deep dive into failure patterns and time sinks
-- **Deployment Analysis**: Check current deployment status and strategies
-- **Branch Analysis**: Map branch purposes and deployment methods
-- **Pattern Detection**: Find failure clusters and circular development
-
-### 🧠 BMAD-Inspired Patterns
-- **Activation Sequence**: Agents follow startup protocol (read instructions → load config → greet → halt)
-- **Mandatory Interaction**: Interactive mode requires user responses between questions
-- **Violation Detection**: Prevents agents from dumping everything at once
-- **Mode Selection**: Choose between interactive (step-by-step) or YOLO (all at once)
-
-## Installation
+## Quick Start
 
 ```bash
-# Clone the repository
-git clone <repository-url>
-cd microsoft-store-mcp
+# Add to Claude Code (one command)
+claude mcp add the-weaver -- npx -y the-weaver
 
-# Install dependencies
-npm install
-
-# Build the TypeScript
-npm run build
-
-# Run in development mode
-npm run dev
+# Or install globally
+npm install -g the-weaver
 ```
 
-## Usage
+Then in your AI coding tool, use the `/start_retrospective` prompt to begin.
 
-### Starting a Weaver Review
+## What It Does
 
-```typescript
-// Interactive mode - asks questions one at a time
-{
-  "tool": "weaver_review",
-  "arguments": {
-    "mode": "interactive"
-  }
-}
+The Weaver analyzes your git repository and facilitates a structured retrospective conversation:
 
-// YOLO mode - complete analysis without interaction
-{
-  "tool": "weaver_review", 
-  "arguments": {
-    "mode": "yolo"
-  }
-}
-```
-
-### Starting an Investigation
-
-```typescript
-{
-  "tool": "weaver_investigate",
-  "arguments": {
-    "pattern": "build_failures"  // or "circular_commits", "time_sinks", "abandoned_work"
-  }
-}
-```
-
-### Answering Questions
-
-```typescript
-{
-  "tool": "answer_question",
-  "arguments": {
-    "answer": "The build kept failing because we didn't understand the MSIX packaging requirements..."
-  }
-}
-```
-
-## Project Structure
-
-```
-microsoft-store-mcp/
-├── src/
-│   ├── index.ts                          # Main MCP server
-│   ├── weaver/
-│   │   ├── orchestrator.ts               # Enforces step-by-step flow
-│   │   ├── review-orchestrator.ts        # Retrospective analysis
-│   │   ├── investigation-orchestrator.ts # Failure pattern investigation
-│   │   └── state-manager.ts              # Tracks conversation state
-│   ├── tools/
-│   │   ├── deployment-analyzer.ts        # Analyzes deployments
-│   │   ├── branch-checker.ts             # Maps branches
-│   │   └── git-pattern-detector.ts       # Finds patterns
-│   └── resources/
-│       ├── weave-loader.ts               # Loads .weave files
-│       └── agent-instructions.ts         # Loads agent configs
-├── .weave/                                # Weaver configuration (in projects)
-│   ├── config.yaml                       # Project settings
-│   ├── connections.yaml                  # Human-AI collaboration log
-│   └── evolution-log.md                  # Lessons learned
-├── agents/                                # Agent instruction files
-│   ├── weaver-review.md                  # Review agent spec
-│   └── weaver-investigate.md             # Investigation agent spec
-└── README.md                              # This file
-```
+1. **Analyzes** your commit history, branches, dependencies, and file changes
+2. **Identifies** patterns from 11 SDLC perspectives (architecture, testing, security, collaboration, etc.)
+3. **Facilitates** one-question-at-a-time dialogue about each finding
+4. **Captures** lessons learned as actionable insights
+5. **Generates** an evolution log documenting what was learned
 
 ## How It Works
 
-### 1. Interactive Review Mode
+The Weaver is a **methodology delivery system**, not a standalone AI. It works through your existing AI coding tool (Claude Code, Cursor, VS Code). The host AI provides the intelligence; The Weaver provides structure.
 
-When started in interactive mode, the Weaver Review agent:
+### MCP Primitives
 
-1. **Deep Analysis Phase** (5-10 minutes)
-   - Reads all `.weave/` files
-   - Analyzes git history for patterns
-   - Applies multiple professional perspectives
-   - Synthesizes findings
+| Type | What It Does |
+|------|-------------|
+| **Tools** (8) | Mechanical operations: analyze repos, identify findings, dialogue, save lessons |
+| **Prompts** (5) | Methodology templates that appear as slash commands |
+| **Resources** | Knowledge base: perspectives, methodology, best practices, session state |
 
-2. **Question Generation**
-   - Questions emerge from actual analysis (not scripted)
-   - Prioritized by impact
-   - Limited to 10-15 for reasonable dialogue
+### Available Prompts
 
-3. **Step-by-Step Dialogue**
-   - Presents ONE question
-   - Waits for answer via `answer_question` tool
-   - Records answer
-   - Presents next question
-   - Continues until complete
+| Prompt | Purpose |
+|--------|---------|
+| `start_retrospective` | Full facilitated session |
+| `quick_scan` | Rapid analysis without dialogue |
+| `investigate` | Deep dive on a specific pattern |
+| `debate` | Two perspectives discuss a finding |
+| `generate_report` | Produce final narrative |
 
-4. **Report Generation**
-   - Creates evolution-log.md
-   - Documents patterns and lessons
-   - Generates framework improvements
+### 11 SDLC Perspectives
 
-### 2. Investigation Mode
+Each perspective is a markdown file — community-contributable, no TypeScript needed:
 
-The Investigation agent focuses on undocumented problems:
+1. Planning & Requirements
+2. Architecture & Design
+3. Development & Coding
+4. Testing & Quality
+5. Security
+6. Deployment & Infrastructure
+7. Project Management
+8. Human-AI Collaboration
+9. Documentation
+10. Tool & Technology Selection
+11. Learning & Growth
 
-1. **Pattern Detection**
-   - Build failure clusters (5+ failures in same module)
-   - Circular commits (code added, removed, re-added)
-   - Time sinks (features taking 3x expected time)
-   - Abandoned branches (work started but never merged)
+## Philosophy
 
-2. **Targeted Questions**
-   - "What really happened here?"
-   - "What caused this back-and-forth?"
-   - "What was the hidden complexity?"
+The Weaver is built on principles from military after-action reviews (Blue Angels, Army AAR, Navy lessons learned):
 
-3. **Lesson Extraction**
-   - Documents the real constraints
-   - Captures undocumented requirements
-   - Identifies process improvements
+- **No Blame** — We identify improvements, not fault
+- **Facts First** — What happened before why it happened
+- **Safety First** — Safe words (STOP, PAUSE, BREAK, EXIT) work instantly
+- **Privacy by Default** — Everything stays local, ephemeral unless you save it
+- **Anti-Performance Theater** — No metrics that can be gamed, no surveillance
 
-## Key Differences from Traditional Agents
+> "The moment reflection becomes compliance is the moment learning dies."
 
-### ❌ Traditional Agent Behavior
-- Analyzes everything
-- Asks 20 questions at once
-- User overwhelmed
-- Important insights lost
-- No enforcement of interaction
+## Configuration
 
-### ✅ This MCP Server
-- Analyzes thoughtfully
-- Asks ONE question at a time
-- User engaged in dialogue
-- Insights captured properly
-- Enforced step-by-step process
+### Claude Code
+```bash
+claude mcp add the-weaver -- npx -y the-weaver
+```
 
-## Integration with Claude Desktop
-
-Add to your Claude Desktop configuration:
-
+### Cursor / VS Code
 ```json
 {
   "mcpServers": {
-    "microsoft-store": {
-      "command": "node",
-      "args": ["path/to/microsoft-store-mcp/dist/index.js"],
-      "env": {}
+    "the-weaver": {
+      "command": "npx",
+      "args": ["-y", "the-weaver"]
     }
   }
 }
 ```
 
-## Philosophy
-
-This MCP server embodies key lessons learned:
-
-1. **"Zealous Liar" Prevention**: Agents must verify before claiming
-2. **3-Failure Stop Rule**: Prevent exhaustion spirals
-3. **One Question At A Time**: Deep dialogue over information dumping
-4. **Retrospective Learning**: Turn mistakes into system improvements
-5. **Investigation Mode**: Uncover undocumented problems
-
-## The Weaver Philosophy
-
-The Weaver component is not about perfection during development. It's about:
-- Learning from imperfection
-- Turning mistakes into system improvements
-- Sharing lessons to help others
-- Evolving human-AI collaboration
-
-## Example Session
-
+### Team Usage
+Commit `.mcp.json` to your repo so everyone gets The Weaver:
+```json
+{
+  "mcpServers": {
+    "the-weaver": {
+      "command": "npx",
+      "args": ["-y", "the-weaver"]
+    }
+  }
+}
 ```
-User: Start a weaver review in interactive mode
-
-MCP: ## Weaver Review Started
-
-I've analyzed your repository and found several interesting patterns...
-
-### Question 1 of 12:
-I noticed 23 commits related to MSIX packaging over 3 days. What was the root cause that led to this pattern?
-
-User: The documentation said one thing but the actual requirements were different. We kept trying what the docs said.
-
-MCP: ### Captured:
-Answer recorded: The documentation said one thing but...
-
-### Question 2 of 12:
-There's a circular pattern where you switched between Electron and PWA approaches 4 times. What constraint or misunderstanding caused this back-and-forth?
-
-User: We didn't realize PWABuilder.com could handle everything. We thought we needed Electron for Store submissions.
-
-[... continues one question at a time ...]
-
-MCP: ## Review Complete
-
-Evolution log generated with 12 insights captured.
-Key learnings documented for future projects.
-```
-
-## Benefits
-
-1. **Better Learning Capture**: Thoughtful questions lead to meaningful answers
-2. **Reduced Cognitive Load**: One question at a time prevents overwhelm
-3. **Actionable Insights**: Lessons turn into concrete improvements
-4. **Pattern Recognition**: Identifies systemic issues not just symptoms
-5. **Knowledge Preservation**: Captures why decisions were made
-
-## Future Enhancements
-
-- [ ] Integration with GitHub Issues for automatic improvement tracking
-- [ ] Support for multiple project types beyond Microsoft Store
-- [ ] Machine learning on captured patterns across projects
-- [ ] Team collaboration features for shared learning
-- [ ] Automated pattern detection from CI/CD logs
 
 ## Contributing
 
-The Weaver system is designed to evolve based on captured lessons. Contributions welcome:
+The easiest way to contribute is adding a new perspective — it's just a markdown file with YAML frontmatter. See [perspectives/README.md](perspectives/README.md) for the format and [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
-1. Share your evolution logs (sanitized)
-2. Contribute new investigation patterns
-3. Improve question generation algorithms
-4. Add new professional perspectives
+## Development
+
+```bash
+git clone https://github.com/PatrickRutledge/the-weave.git
+cd the-weave
+npm install
+npm run build
+npm test
+```
 
 ## License
 
-MIT
-
-## Acknowledgments
-
-- BMAD Method for enforcement patterns
-- The "zealous liar" pattern that started it all
-- Every failed build that taught us something
+MIT — see [LICENSE](LICENSE)
