@@ -60,8 +60,9 @@ export class PerspectiveLoader {
     const content = await fs.readFile(filePath, 'utf-8');
     const id = path.basename(filePath, '.md');
 
-    // Parse YAML frontmatter
-    const frontmatterMatch = content.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/);
+    // Parse YAML frontmatter (handle both LF and CRLF line endings)
+    const normalized = content.replace(/\r\n/g, '\n');
+    const frontmatterMatch = normalized.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/);
     if (!frontmatterMatch) {
       throw new Error(`No YAML frontmatter found in ${filePath}`);
     }
