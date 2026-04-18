@@ -12,6 +12,8 @@ triggers:
   - "hotfix or rollback patterns in commit history"
   - "infrastructure-as-code file changes"
   - "build script modifications and pipeline adjustments"
+  - "multiple deployment targets attempted (branch names suggest channel pivots)"
+  - "repeated fix sequences around deploy configs"
 antiPatterns:
   - "Deployment Dread: releasing to production was a high-stress, manual, error-prone event that the team avoided as long as possible, creating larger and riskier releases"
   - "Snowflake Environments: development, staging, and production drifted apart over time, causing works-on-my-machine failures and environment-specific bugs"

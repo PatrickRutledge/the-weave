@@ -88,6 +88,40 @@ export interface DependencyAnalysis {
   linters: string[];
 }
 
+export interface PivotSignal {
+  hash: string;
+  date: string;
+  message: string;
+  kind: 'rewrite' | 'migrate' | 'switch' | 'overhaul';
+  filesChanged?: number;
+}
+
+export interface PhaseMarker {
+  hash: string;
+  date: string;
+  message: string;
+  phase: string;
+}
+
+export interface FixSequence {
+  startHash: string;
+  endHash: string;
+  commitCount: number;
+  topic: string;
+  messages: string[];
+}
+
+export interface MessageSignals {
+  pivots: PivotSignal[];
+  phaseMarkers: PhaseMarker[];
+  fixSequences: FixSequence[];
+}
+
+export interface BranchInsights {
+  deployTargets: string[];
+  intents: Record<string, string>;
+}
+
 export interface RepositoryAnalysis {
   path: string;
   analyzedAt: string;
@@ -108,6 +142,10 @@ export interface RepositoryAnalysis {
   circularPatterns: CircularPattern[];
   burstPeriods: { start: string; end: string; commitCount: number }[];
   dependencies?: DependencyAnalysis;
+  messageSignals?: MessageSignals;
+  branchInsights?: BranchInsights;
+  firstCommit?: CommitInfo;
+  lastCommit?: CommitInfo;
 }
 
 export interface Finding {
