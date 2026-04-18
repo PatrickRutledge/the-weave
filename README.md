@@ -18,13 +18,14 @@ Then in your AI coding tool, use the `/start_retrospective` prompt to begin.
 
 ## What It Does
 
-The Weaver analyzes your git repository and facilitates a structured retrospective conversation:
+The Weaver analyzes your git repository and facilitates a structured retrospective conversation — then helps you track what you learned across projects over time:
 
-1. **Analyzes** your commit history, branches, dependencies, and file changes
-2. **Identifies** patterns from 11 SDLC perspectives (architecture, testing, security, collaboration, etc.)
+1. **Analyzes** commit history, branches, dependencies, file changes, commit messages, and branch names
+2. **Identifies** patterns from 11 SDLC perspectives — deduplicated across perspectives, with evidence cited inline
 3. **Facilitates** one-question-at-a-time dialogue about each finding
-4. **Captures** lessons learned as actionable insights
-5. **Generates** an evolution log documenting what was learned
+4. **Captures** lessons learned as actionable insights (to the project or your personal journal)
+5. **Generates** a chronological narrative evolution log — the story of the project, not a stats dump
+6. **Tracks** your evolution across projects through an optional **personal learning journal** — intentions, concepts, cross-project patterns, ready-to-paste prompts for mentor/tutor/future-self conversations
 
 ## How It Works
 
@@ -34,7 +35,7 @@ The Weaver is a **methodology delivery system**, not a standalone AI. It works t
 
 | Type | What It Does |
 |------|-------------|
-| **Tools** (8) | Mechanical operations: analyze repos, identify findings, dialogue, save lessons |
+| **Tools** (13) | Mechanical operations: analyze repos, identify findings, dialogue, save lessons, manage journal + intentions |
 | **Prompts** (5) | Methodology templates that appear as slash commands |
 | **Resources** | Knowledge base: perspectives, methodology, best practices, session state |
 
@@ -63,6 +64,28 @@ Each perspective is a markdown file — community-contributable, no TypeScript n
 9. Documentation
 10. Tool & Technology Selection
 11. Learning & Growth
+
+### Personal Learning Journal
+
+Separate from the per-project `.weave/` directory, you can point The Weaver at a personal journal — a dedicated directory (optionally its own git repo, optionally pushed to a private GitHub remote) where your *own* evolution across projects accumulates.
+
+```bash
+# Initialize a journal once, anywhere
+export WEAVER_JOURNAL_PATH="$HOME/dev-journal"
+# Then ask your AI: "Initialize my Weaver journal"
+```
+
+The journal contains:
+
+- `intentions.json` — things you want future-you to remember, with kept/abandoned status
+- `current-state.md` — rolling snapshot regenerated after every session
+- `sessions/` — one retrospective narrative per project, per run
+- `concepts/` — a growing glossary of what you've learned
+- `insights/` — cross-project patterns you name yourself
+- `vault/` — private entries never included in exports without re-consent
+- `prompts/ask-a-mentor.md`, `tutor-me.md`, `future-self.md` — ready-to-paste conversation seeds auto-regenerated from current journal state
+
+Nothing leaves your machine unless you push it yourself. The journal is plain markdown and JSON — readable without The Weaver if the tool ever goes away.
 
 ## Philosophy
 
