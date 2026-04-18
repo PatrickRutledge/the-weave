@@ -96,7 +96,7 @@ export function registerTools(server: McpServer, orchestrator: SessionOrchestrat
         const findings = await orchestrator.identifyFindings(analysis, perspectives);
 
         const summary = findings.map((f, i) =>
-          `${i + 1}. [${f.severity}] ${f.title} (${f.perspective})`
+          `${i + 1}. [${f.severity}] ${f.title} (${f.perspectives.join(', ')})`
         ).join('\n');
 
         return {
@@ -382,7 +382,7 @@ export function registerTools(server: McpServer, orchestrator: SessionOrchestrat
           lines.push('');
           lines.push('## Previously Captured Lessons');
           for (const lesson of allLessons) {
-            lines.push(`- **${lesson.title}** (${lesson.perspective}): ${lesson.insight.slice(0, 100)}`);
+            lines.push(`- **${lesson.title}** (${lesson.perspectives.join(', ')}): ${lesson.insight.slice(0, 100)}`);
           }
         }
 

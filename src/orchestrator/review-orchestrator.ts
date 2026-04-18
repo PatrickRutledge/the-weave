@@ -15,7 +15,7 @@ export class ReviewOrchestrator {
     const lines: string[] = [];
 
     lines.push(`### Finding ${progress.current} of ${progress.total}`);
-    lines.push(`**Perspective**: ${finding.perspective}`);
+    lines.push(`**Perspective**: ${finding.perspectives.join(', ')}`);
     lines.push(`**Severity**: ${finding.severity}`);
     lines.push('');
     lines.push(finding.description);
@@ -95,7 +95,7 @@ export class ReviewOrchestrator {
       lines.push('');
       for (const lesson of lessons) {
         lines.push(`### ${lesson.title}`);
-        lines.push(`*Perspective: ${lesson.perspective}*`);
+        lines.push(`*Perspective: ${lesson.perspectives.join(', ')}*`);
         lines.push('');
         lines.push(lesson.insight);
         lines.push('');

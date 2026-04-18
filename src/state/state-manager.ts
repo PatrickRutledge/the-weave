@@ -88,7 +88,7 @@ export class StateManager {
 
     const merged: Finding = {
       id: findings[0].id,
-      perspective: findings.map(f => f.perspective).join(', '),
+      perspectives: [...new Set(findings.flatMap(f => f.perspectives))],
       title: findings[0].title,
       description: findings.map(f => f.description).join('\n\n'),
       evidence: findings.flatMap(f => f.evidence),

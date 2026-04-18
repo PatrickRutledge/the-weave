@@ -45,7 +45,7 @@ describe('SessionOrchestrator', () => {
     // Every finding should have required fields
     for (const f of findings) {
       expect(f.id).toBeTruthy();
-      expect(f.perspective).toBeTruthy();
+      expect(f.perspectives.length).toBeGreaterThan(0);
       expect(f.title).toBeTruthy();
       expect(f.severity).toMatch(/^(critical|high|medium|low)$/);
       expect(f.category).toMatch(/^(pattern|antipattern|insight|question)$/);

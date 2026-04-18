@@ -5,7 +5,7 @@ import type { Finding, Lesson } from '../../src/engine/types.js';
 function makeFinding(overrides: Partial<Finding> = {}): Finding {
   return {
     id: Math.random().toString(36).slice(2, 10),
-    perspective: 'testing',
+    perspectives: ['testing'],
     title: 'Test finding',
     description: 'A test finding',
     evidence: ['evidence 1'],
@@ -92,7 +92,7 @@ describe('StateManager', () => {
         title: 'Test lesson',
         insight: 'We learned something',
         actionItems: ['Do something'],
-        perspective: 'testing',
+        perspectives: ['testing'],
         capturedAt: new Date().toISOString(),
       };
       mgr.captureLesson(lesson);
@@ -128,7 +128,7 @@ describe('StateManager', () => {
     mgr.setFindings([makeFinding()]);
     mgr.captureLesson({
       id: 'l1', findingId: 'f1', title: 't', insight: 'i',
-      actionItems: [], perspective: 'p', capturedAt: '',
+      actionItems: [], perspectives: ['p'], capturedAt: '',
     });
 
     const oldId = mgr.getState().id;

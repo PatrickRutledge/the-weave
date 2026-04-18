@@ -65,19 +65,39 @@ export class SessionOrchestrator {
       ? perspectives.filter(p => perspectiveIds.includes(p.id))
       : perspectives;
 
-    const findings: Finding[] = [];
+    const raw: Finding[] = [];
 
     for (const perspective of activePerspectives) {
-      const perspectiveFindings = this.applyPerspective(perspective, analysis);
-      findings.push(...perspectiveFindings);
+      raw.push(...this.applyPerspective(perspective, analysis));
     }
 
-    // Sort by severity then category
+    // Deduplicate: findings with identical (title, category) collapse into one,
+    // merging perspective tags. This prevents the same real pattern (e.g. "circular
+    // development") from appearing once per perspective whose trigger list matched.
+    const findings = this.dedupeFindings(raw);
+
+    // Sort by severity
     const severityOrder = { critical: 0, high: 1, medium: 2, low: 3 };
     findings.sort((a, b) => severityOrder[a.severity] - severityOrder[b.severity]);
 
     this.stateManager.setFindings(findings);
     return findings;
+  }
+
+  private dedupeFindings(findings: Finding[]): Finding[] {
+    const byKey = new Map<string, Finding>();
+    for (const f of findings) {
+      const key = `${f.category}::${f.title}`;
+      const existing = byKey.get(key);
+      if (existing) {
+        for (const p of f.perspectives) {
+          if (!existing.perspectives.includes(p)) existing.perspectives.push(p);
+        }
+      } else {
+        byKey.set(key, { ...f, perspectives: [...f.perspectives] });
+      }
+    }
+    return [...byKey.values()];
   }
 
   startSession(repoPath: string, mode: SessionState['mode']): void {
@@ -124,14 +144,15 @@ export class SessionOrchestrator {
     const findings: Finding[] = [];
     const makeId = () => randomBytes(6).toString('hex');
 
-    // Check triggers against analysis data
+    // Check triggers against analysis data. Findings only fire when the analysis
+    // contains observable evidence; we no longer emit questionFocus items as findings.
     for (const trigger of perspective.triggers) {
       const triggered = this.checkTrigger(trigger, analysis);
       if (triggered) {
         findings.push({
           id: makeId(),
-          perspective: perspective.id,
-          title: `${perspective.name}: ${triggered.title}`,
+          perspectives: [perspective.id],
+          title: triggered.title,
           description: triggered.description,
           evidence: triggered.evidence,
           severity: triggered.severity,
@@ -146,24 +167,12 @@ export class SessionOrchestrator {
       if (found) {
         findings.push({
           id: makeId(),
-          perspective: perspective.id,
-          title: `${perspective.name}: ${found.title}`,
+          perspectives: [perspective.id],
+          title: found.title,
           description: found.description,
           evidence: found.evidence,
           severity: found.severity,
           category: 'antipattern',
-        });
-      }
-    }
-
-    // Generate insight findings from questions
-    for (const focus of perspective.questionFocus) {
-      const insight = this.generateInsightFinding(focus, perspective, analysis);
-      if (insight) {
-        findings.push({
-          id: makeId(),
-          perspective: perspective.id,
-          ...insight,
         });
       }
     }
@@ -219,14 +228,33 @@ export class SessionOrchestrator {
       };
     }
 
-    if (lowerTrigger.includes('abandoned') || lowerTrigger.includes('stale branch')) {
-      const stale = analysis.activeBranches.filter(b => b.daysSinceLastCommit > 30);
+    // Exclude default branches — an idle main is not "dead work."
+    const isDefault = (name: string) => /^(main|master|develop|dev|trunk)$/.test(name);
+
+    if (lowerTrigger.includes('abandoned')) {
+      const abandoned = analysis.activeBranches.filter(
+        b => b.daysSinceLastCommit > 180 && !isDefault(b.name)
+      );
+      if (abandoned.length > 0) {
+        return {
+          title: 'Abandoned branches',
+          description: `${abandoned.length} branch(es) have had no activity for over 180 days — likely dead work.`,
+          evidence: abandoned.map(b => `${b.name}: ${b.daysSinceLastCommit} days since last commit`),
+          severity: abandoned.length > 3 ? 'medium' : 'low',
+        };
+      }
+    }
+
+    if (lowerTrigger.includes('stale branch')) {
+      const stale = analysis.activeBranches.filter(
+        b => b.daysSinceLastCommit > 30 && b.daysSinceLastCommit <= 180 && !isDefault(b.name)
+      );
       if (stale.length > 0) {
         return {
-          title: 'Abandoned branches found',
-          description: `${stale.length} branch(es) have had no activity for over 30 days.`,
+          title: 'Stale branches',
+          description: `${stale.length} branch(es) have had no activity for 30-180 days.`,
           evidence: stale.map(b => `${b.name}: ${b.daysSinceLastCommit} days since last commit`),
-          severity: stale.length > 3 ? 'medium' : 'low',
+          severity: 'low',
         };
       }
     }
@@ -273,16 +301,4 @@ export class SessionOrchestrator {
     return null;
   }
 
-  private generateInsightFinding(focus: string, perspective: PerspectiveDefinition, analysis: RepositoryAnalysis): { title: string; description: string; evidence: string[]; severity: Finding['severity']; category: Finding['category'] } | null {
-    // Generate question-based findings that prompt dialogue
-    if (analysis.totalCommits < 5) return null;
-
-    return {
-      title: focus,
-      description: `From the ${perspective.name} perspective: ${focus}`,
-      evidence: [`Based on analysis of ${analysis.totalCommits} commits across ${analysis.activeBranches.length} branch(es)`],
-      severity: 'medium',
-      category: 'question',
-    };
-  }
 }

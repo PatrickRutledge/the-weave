@@ -112,7 +112,7 @@ export interface RepositoryAnalysis {
 
 export interface Finding {
   id: string;
-  perspective: string;
+  perspectives: string[];
   title: string;
   description: string;
   evidence: string[];
@@ -127,7 +127,7 @@ export interface Lesson {
   title: string;
   insight: string;
   actionItems: string[];
-  perspective: string;
+  perspectives: string[];
   capturedAt: string;
   userResponse?: string;
 }
