@@ -16,7 +16,7 @@ export class LessonManager {
       title: finding.title,
       insight: this.extractInsight(finding, userResponse),
       actionItems: this.suggestActions(finding, userResponse),
-      perspective: finding.perspective,
+      perspectives: [...finding.perspectives],
       capturedAt: new Date().toISOString(),
       userResponse,
     };
@@ -46,8 +46,8 @@ export class LessonManager {
   }
 
   private extractInsight(finding: Finding, response: string): string {
-    // Build insight by combining finding context with user response
-    return `From ${finding.perspective} perspective: ${finding.title}. ` +
+    const persp = finding.perspectives.join(' / ');
+    return `From ${persp} perspective: ${finding.title}. ` +
       `User insight: ${response.slice(0, 500)}`;
   }
 

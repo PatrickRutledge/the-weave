@@ -14,8 +14,8 @@ export class GitAnalyzer {
     await this.assertIsRepo();
 
     const [log, branches] = await Promise.all([
-      this.git.log(['--max-count', String(maxCommits), '--stat']),
-      this.git.branchLocal(),
+      this.git.log(['--all', '--max-count', String(maxCommits), '--stat']),
+      this.git.branch(['-a']),
     ]);
 
     const commits = this.parseCommits(log);
@@ -69,7 +69,22 @@ export class GitAnalyzer {
   private async analyzeBranches(branches: { all: string[]; current: string }): Promise<BranchInfo[]> {
     const results: BranchInfo[] = [];
 
-    for (const branch of branches.all) {
+    // Deduplicate local + remote-tracking copies of the same branch.
+    // Prefer the local name when both exist.
+    const canonicalName = (b: string): string => b.replace(/^remotes\/[^/]+\//, '');
+    const seen = new Set<string>();
+    const unique: string[] = [];
+    const locals = new Set(branches.all.filter(b => !b.startsWith('remotes/')));
+    for (const b of branches.all) {
+      const canon = canonicalName(b);
+      if (seen.has(canon)) continue;
+      // If a local exists for this canonical name, only keep the local
+      if (b.startsWith('remotes/') && locals.has(canon)) continue;
+      seen.add(canon);
+      unique.push(b);
+    }
+
+    for (const branch of unique) {
       try {
         const log = await this.git.log([branch, '--max-count', '1']);
         const commitCount = await this.git.raw(['rev-list', '--count', branch]);

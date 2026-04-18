@@ -42,7 +42,7 @@ export class InvestigationOrchestrator {
   private investigateCircular(analysis: RepositoryAnalysis): Finding[] {
     return analysis.circularPatterns.map((cp, i) => ({
       id: `circ-${i}`,
-      perspective: 'development-coding',
+      perspectives: ['development-coding'],
       title: `Circular development: ${cp.file}`,
       description: cp.description,
       evidence: [`File: ${cp.file}`, `Pattern: add → remove → re-add`],
@@ -54,7 +54,7 @@ export class InvestigationOrchestrator {
   private investigateTimeSinks(analysis: RepositoryAnalysis): Finding[] {
     return analysis.timeSinks.map((ts, i) => ({
       id: `sink-${i}`,
-      perspective: 'project-management',
+      perspectives: ['project-management'],
       title: `Time sink: "${ts.topic}"`,
       description: `Feature area "${ts.topic}" consumed ${ts.commitCount} commits over ${ts.spanDays} days.`,
       evidence: [
@@ -72,7 +72,7 @@ export class InvestigationOrchestrator {
       .filter(b => b.daysSinceLastCommit > 30)
       .map((branch, i) => ({
         id: `abandoned-${i}`,
-        perspective: 'project-management',
+        perspectives: ['project-management'],
         title: `Abandoned branch: ${branch.name}`,
         description: `Branch "${branch.name}" has had no activity for ${branch.daysSinceLastCommit} days.`,
         evidence: [
@@ -97,7 +97,7 @@ export class InvestigationOrchestrator {
       if (fixCommits.length >= 3) {
         findings.push({
           id: `build-${findings.length}`,
-          perspective: 'development-coding',
+          perspectives: ['development-coding'],
           title: `Build failure cluster around ${cluster.dominantTopic}`,
           description: `${fixCommits.length} fix-related commits in a cluster of ${cluster.commits.length} commits.`,
           evidence: fixCommits.slice(0, 5).map(c => `"${c.message}" (${c.date})`),
@@ -113,7 +113,7 @@ export class InvestigationOrchestrator {
   private investigateHotspots(analysis: RepositoryAnalysis): Finding[] {
     return analysis.hotspots.slice(0, 10).map((h, i) => ({
       id: `hotspot-${i}`,
-      perspective: 'architecture-design',
+      perspectives: ['architecture-design'],
       title: `File hotspot: ${h.path}`,
       description: `${h.path} was changed ${h.changeCount} times by ${h.uniqueAuthors} author(s).`,
       evidence: [
@@ -129,7 +129,7 @@ export class InvestigationOrchestrator {
   private investigateCustom(pattern: string, analysis: RepositoryAnalysis): Finding[] {
     return [{
       id: `custom-0`,
-      perspective: 'learning-growth',
+      perspectives: ['learning-growth'],
       title: `Custom investigation: ${pattern}`,
       description: `Investigating custom pattern "${pattern}" across ${analysis.totalCommits} commits.`,
       evidence: [`Repository: ${analysis.path}`, `Branches: ${analysis.activeBranches.length}`],
